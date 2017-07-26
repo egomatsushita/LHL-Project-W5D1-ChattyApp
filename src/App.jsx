@@ -19,6 +19,8 @@ class App extends Component {
                     }
                   ]
                   };
+    this.socket = {server: "ws://localhost:3001"}
+
   }
 
   handleNewMessages(newMessage) {
@@ -38,6 +40,12 @@ class App extends Component {
       // Calling setState will trigger a call to render() in App and all child components.
       this.setState({messages: messages})
     }, 3000);
+
+    const connection = new WebSocket(this.socket.server);
+
+    connection.onopen = function() {
+      console.log("Connected to server");
+    };
   }
 
   render() {
