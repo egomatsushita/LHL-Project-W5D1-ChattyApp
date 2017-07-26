@@ -9,8 +9,8 @@ class MessageList extends Component {
   render() {
     console.log("Rendering <MessgeList/>");
     const messages = this.props.messages;
-    const messageList = messages.map((message, index) => {
-      return <Message user={message.username} message={message.content} key={index}  />
+    const messageList = messages.map((message) => {
+      return <Message user={message.username} message={message.content} key={message.id}  />
     });
 
     return (

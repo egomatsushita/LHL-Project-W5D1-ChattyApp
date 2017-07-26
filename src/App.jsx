@@ -8,10 +8,12 @@ class App extends Component {
     this.state = {currentUser: {name: "Bob"},
                   messages: [
                     {
+                      id: 1,
                       username: "Bob",
                       content: "Has anyone seen my marbles?",
                     },
                     {
+                      id: 2,
                       username: "Anonymous",
                       content: "No, I think you lost them. You lost your marbles Bob. You lost them for good."
                     }
@@ -19,8 +21,10 @@ class App extends Component {
                   };
   }
 
-  updateMessages() {
-    this.setState();
+  handleNewMessages(newMessage) {
+    newMessage.id = this.state.messages.length + 1;
+    const messages = this.state.messages.concat(newMessage);
+    this.setState({messages: messages});
   }
 
   componentDidMount() {
@@ -30,7 +34,7 @@ class App extends Component {
       // Add a new message to the list of messages in the data store
       const newMessage = {id: 3, username: "Michelle", content: "Hello there!"};
       const messages = this.state.messages.concat(newMessage);
-      // Updae the state of the app component.
+      // Update the state of the app component.
       // Calling setState will trigger a call to render() in App and all child components.
       this.setState({messages: messages})
     }, 3000);
@@ -44,7 +48,7 @@ class App extends Component {
           <a href="/" className="navbar-brand">Chatty</a>
         </nav>
         <MessageList messages={this.state.messages} />
-        <ChatBar username={this.state.currentUser.name} />
+        <ChatBar username={this.state.currentUser.name} message={this.handleNewMessages.bind(this)} />
       </div>
     );
   }
