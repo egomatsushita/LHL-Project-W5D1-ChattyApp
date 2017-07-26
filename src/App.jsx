@@ -19,7 +19,7 @@ class App extends Component {
                     }
                   ]
                   };
-    this.socket = {server: "ws://localhost:3001"}
+    this.socket = "ws://localhost:3001";
 
   }
 
@@ -27,6 +27,15 @@ class App extends Component {
     newMessage.id = this.state.messages.length + 1;
     const messages = this.state.messages.concat(newMessage);
     this.setState({messages: messages});
+
+    let msg = {
+      type: "message",
+      text: newMessage.content,
+      id: newMessage.id,
+      user: newMessage.username
+    }
+
+    this.connection.send(JSON.stringify(msg))
   }
 
   componentDidMount() {
@@ -41,11 +50,12 @@ class App extends Component {
       this.setState({messages: messages})
     }, 3000);
 
-    const connection = new WebSocket(this.socket.server);
 
-    connection.onopen = function() {
+    this.connection = new WebSocket(this.socket);
+    this.connection.onopen = function() {
       console.log("Connected to server");
     };
+
   }
 
   render() {
