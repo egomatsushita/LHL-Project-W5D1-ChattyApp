@@ -5,19 +5,8 @@ import ChatBar from './ChatBar.jsx';
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {currentUser: {name: "Bob"},
-                  messages: [
-                    {
-                      id: 1,
-                      username: "Bob",
-                      content: "Has anyone seen my marbles?",
-                    },
-                    {
-                      id: 2,
-                      username: "Anonymous",
-                      content: "No, I think you lost them. You lost your marbles Bob. You lost them for good."
-                    }
-                  ]
+    this.state = {currentUser: {name: "Anonymous"},
+                  messages: []
                   };
     this.socket = "ws://localhost:3001";
 
@@ -34,13 +23,13 @@ class App extends Component {
       id: newMessage.id,
       user: newMessage.username
     }
-
-    this.connection.send(JSON.stringify(msg))
+    console.log("handle message >>> ", msg)
+    this.ws.send(JSON.stringify(msg))
   }
 
   componentDidMount() {
     console.log("componentDidMount <App />");
-    setTimeout(() => {
+    /*setTimeout(() => {
       console.log("Simulating incoming message");
       // Add a new message to the list of messages in the data store
       const newMessage = {id: 3, username: "Michelle", content: "Hello there!"};
@@ -48,12 +37,17 @@ class App extends Component {
       // Update the state of the app component.
       // Calling setState will trigger a call to render() in App and all child components.
       this.setState({messages: messages})
-    }, 3000);
+    }, 3000);*/
 
 
-    this.connection = new WebSocket(this.socket);
-    this.connection.onopen = function() {
+    this.ws = new WebSocket(this.socket);
+    this.ws.onmessage = (event) => {
       console.log("Connected to server");
+      const receivedMessage = JSON.parse(event.data);
+      let updatedMessage = this.state.messages.concat(receivedMessage);
+      this.setState({messages: updatedMessage})
+      console.log("received message >>> ", updatedMessage);
+
     };
 
   }
