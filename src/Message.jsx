@@ -7,15 +7,24 @@ class Message extends Component {
 
   render() {
     console.log("Rendering <Message/>");
-    const username = this.props.user;
-    const aMessage = this.props.message;
+    const messageProps = this.props.messageProps;
+    const username = messageProps.user;
+    const aMessage = messageProps.text;
+    console.log(" MESSAGE PROPS ", messageProps)
+    console.log("MESSAGE PROPS TYPE", messageProps.type);
 
-    return (
-      <div className="message">
-        <span className="message-username">{username}</span>
-        <span className="message-content">{aMessage}</span>
-      </div>
-    );
+    if (messageProps.type === "incomingMessage") {
+      return (
+        <div className="message">
+          <span className="message-username">{username}</span>
+          <span className="message-content">{aMessage}</span>
+        </div>
+      );
+    } else  {
+      return (
+        <div className="message system">{aMessage}</div>
+      );
+    }
   }
 }
 

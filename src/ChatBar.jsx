@@ -3,17 +3,24 @@ import React, {Component} from 'react';
 class ChatBar extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      user: "",
-      content: ""
-    }
+    console.log(`THIS PROPS USRNAME >>> ${this.props.username}`)
   }
 
   handleKeyPress(e) {
     if (e.key === 'Enter') {
-      let newMessage = { username: this.textInput.value, content: e.target.value};
-      this.props.message(newMessage);
-      e.target.value = ""
+      if (e.target) {
+        let newMessage = { username: this.props.username, content: e.target.value };
+        this.props.message(newMessage);
+        e.target.value = ""
+      }
+    }
+  }
+
+  handleUsername(event) {
+    if (event.key === 'Enter') {
+      let aUsername = event.target.value;
+      let notificationMessage = { username: aUsername, notification: `User ${this.props.username} changed to User ${aUsername}`};
+      this.props.notification(notificationMessage);
     }
   }
 
@@ -21,7 +28,7 @@ class ChatBar extends Component {
     console.log("Rendering <ChatBar/>");
     return (
       <footer className="chatbar">
-        <input className="chatbar-username" type="text" placeholder="Your Name (Optional)" defaultValue={this.props.username}  ref={(input) => {this.textInput = input;}} />
+        <input className="chatbar-username" type="text" placeholder="Your Name (Optional)" defaultValue={this.props.username} onKeyPress={this.handleUsername.bind(this)} />
         <input className="chatbar-message" type="text" placeholder="Type a message and hit ENTER" onKeyPress={this.handleKeyPress.bind(this)} />
       </footer>
     );

@@ -29,14 +29,26 @@ wss.on('connection', function connection(ws) {
 
 
   ws.on('message', function incoming(data) {
-    console.log(data);
-    // Initialize a new client id
     const aMessage = JSON.parse(data);
-    aMessage.id = uuid.v4();
-    conversation = aMessage;
-    console.log("server >>> ", conversation)
-    wss.broadcast(JSON.stringify(conversation));
-    // console.log(`User ${aMessage.user} said ${aMessage.text}`);
+    switch (aMessage.type) {
+      case 'postMessage':
+        aMessage.id = uuid.v4();
+        aMessage.type = "incomingMessage";
+        wss.broadcast(JSON.stringify(aMessage));
+        console.log(`User ${aMessage.user} said ${aMessage.text}`);
+        break;
+      case 'postNotification':
+        aMessage.id = uuid.v4();
+        aMessage.type = "incomingNotification";
+        wss.broadcast(JSON.stringify(aMessage));
+        console.log(aMessage.text);
+        break;
+      default:
+        throw new Error(`Unknown event type ${aMessage.type}`);
+
+
+    }
+
   });
 
 // Broadcast to all
@@ -47,7 +59,6 @@ wss.broadcast = function broadcast(data) {
     }
   })
 }
-  // ws.send('something');
 
   // Set up a callback for when a client closes the socket. This usually means they closed their browser.
   ws.on('close', () => console.log('Client disconnected'));

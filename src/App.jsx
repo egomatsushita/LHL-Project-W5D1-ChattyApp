@@ -9,45 +9,56 @@ class App extends Component {
                   messages: []
                   };
     this.socket = "ws://localhost:3001";
+    this.handleNewMessages = this.handleNewMessages.bind(this);
+    this.handleNewNotifications = this.handleNewNotifications.bind(this);
 
   }
 
+
   handleNewMessages(newMessage) {
-    newMessage.id = this.state.messages.length + 1;
+    // newMessage.id = this.state.messages.length + 1;
     const messages = this.state.messages.concat(newMessage);
-    this.setState({messages: messages});
+    console.log("MESSAGEs >>> ", messages)
 
     let msg = {
-      type: "message",
+      type: "postMessage",
       text: newMessage.content,
       id: newMessage.id,
       user: newMessage.username
     }
-    console.log("handle message >>> ", msg)
+
+    this.ws.send(JSON.stringify(msg))
+  }
+
+  handleNewNotifications(newNotification) {
+    console.log("NEW NOTIFICATION >>> ", newNotification)
+
+    this.state.messages.concat(newNotification);
+    this.state.currentUser.name = newNotification.username;
+
+    let msg = {
+      type: "postNotification",
+      text: newNotification.notification,
+      id: newNotification.id,
+      user: newNotification.username
+    }
+
     this.ws.send(JSON.stringify(msg))
   }
 
   componentDidMount() {
     console.log("componentDidMount <App />");
-    /*setTimeout(() => {
-      console.log("Simulating incoming message");
-      // Add a new message to the list of messages in the data store
-      const newMessage = {id: 3, username: "Michelle", content: "Hello there!"};
-      const messages = this.state.messages.concat(newMessage);
-      // Update the state of the app component.
-      // Calling setState will trigger a call to render() in App and all child components.
-      this.setState({messages: messages})
-    }, 3000);*/
-
 
     this.ws = new WebSocket(this.socket);
-    this.ws.onmessage = (event) => {
+
+    this.ws.onopen = (event) => {
       console.log("Connected to server");
+    }
+
+    this.ws.onmessage = (event) => {
       const receivedMessage = JSON.parse(event.data);
       let updatedMessage = this.state.messages.concat(receivedMessage);
       this.setState({messages: updatedMessage})
-      console.log("received message >>> ", updatedMessage);
-
     };
 
   }
@@ -60,7 +71,7 @@ class App extends Component {
           <a href="/" className="navbar-brand">Chatty</a>
         </nav>
         <MessageList messages={this.state.messages} />
-        <ChatBar username={this.state.currentUser.name} message={this.handleNewMessages.bind(this)} />
+        <ChatBar username={this.state.currentUser.name} message={this.handleNewMessages} notification={this.handleNewNotifications} />
       </div>
     );
   }
