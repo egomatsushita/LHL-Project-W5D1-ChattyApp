@@ -18,14 +18,19 @@ const server = express()
 const wss = new SocketServer({ server });
 
 // Currently connected clients
-let conversation = {};
-
+let clients = {};
 
 // Set up a callback that will run when a client connects to the server
 // When a client connects they are assigned a socket, represented by
 // the ws parameter in the callback.
 wss.on('connection', function connection(ws) {
   console.log('Client connected');
+
+  // initialize a new client id
+  const clientId = uuid();
+  console.log("CLIENT ID ", clientId);
+  // send itial client data
+  clientConnected(ws, clientId);
 
 
   ws.on('message', function incoming(data) {
@@ -45,11 +50,63 @@ wss.on('connection', function connection(ws) {
         break;
       default:
         throw new Error(`Unknown event type ${aMessage.type}`);
-
+        break;
 
     }
 
   });
+
+  // Broadcast to all
+  wss.broadcast = function broadcast(data) {
+    wss.clients.forEach(function each(client) {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(data);
+      }
+    })
+  }
+
+
+  // Set up a callback for when a client closes the socket. This usually means they closed their browser.
+  ws.on('close', () => {
+    console.log('Client disconnected')
+    clientDisconected(clientId);
+  });
+});
+
+
+
+  // connection event
+function clientConnected(client, clientId) {
+  // create client data
+  clients[clientId] = {
+    id: clientId,
+  }
+  // setup message to be set to the client
+  // includes all currently connected clients
+  const setupMsg = {
+    type: 'setup',
+    data: {
+      id: clientId,
+      connectedClients: clients
+    }
+  }
+
+  // connection message to be sent to the client
+  // tells teh client who they are
+  const connectionMsg = {
+    type: 'connection',
+    data: clients[clientId]
+  }
+
+  if (client.readyState === client.OPEN) {
+    client.send(JSON.stringify(setupMsg));
+    console.log("SETUP MESSAGE ", setupMsg)
+  }
+
+  console.log("CONNECTION MSG ", connectionMsg)
+  wss.broadcast(JSON.stringify(connectionMsg))
+  console.log(`>> ${clients[clientId].id}`)
+}
 
 // Broadcast to all
 wss.broadcast = function broadcast(data) {
@@ -60,6 +117,25 @@ wss.broadcast = function broadcast(data) {
   })
 }
 
-  // Set up a callback for when a client closes the socket. This usually means they closed their browser.
-  ws.on('close', () => console.log('Client disconnected'));
-});
+
+// diconnection event
+function clientDisconected(clientId) {
+  const client = clients[clientId];
+  if(!client) return;
+
+  const disconnectionMsg = {
+    type: 'disconnection',
+    data: client
+  }
+  wss.broadcast(JSON.stringify(disconnectionMsg))
+  console.log(`<< Client (${clientId} disconnected`);
+  delete clients[clientId];
+}
+
+
+
+
+
+
+
+
