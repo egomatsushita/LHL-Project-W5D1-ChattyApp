@@ -24,7 +24,8 @@ const wss = new SocketServer({ server });
 // When a client connects they are assigned a socket, represented by
 // the ws parameter in the callback.
 wss.on('connection', function connection(ws) {
-  console.log('Client connected');
+  const day = new Date();
+  console.log(`Client connected on ${day}`);
 
   // Increment total of connections
   totalOfConnections++;
@@ -40,7 +41,7 @@ wss.on('connection', function connection(ws) {
 
   // initialize a new client id
   const clientId = uuid();
-  console.log("CLIENT ID ", clientId);
+
   // send initial client data
   clientConnected(ws, clientId);
 
@@ -50,15 +51,16 @@ wss.on('connection', function connection(ws) {
     clients[clientId] = {
       id: clientId,
     }
+
     // setup message to be set to the client
     // includes all currently connected clients
-    /*const setupMsg = {
+    const setupMsg = {
       type: 'setup',
       data: {
         id: clientId,
         connectedClients: clients
       }
-    }*/
+    }
 
     // connection message to be sent to the client
     // tells teh client who they are
@@ -68,9 +70,9 @@ wss.on('connection', function connection(ws) {
       totalOfConnections: totalOfConnections
     }
 
-    /*if (client.readyState === client.OPEN) {
+    if (client.readyState === client.OPEN) {
       client.send(JSON.stringify(setupMsg));
-    }*/
+    }
 
     wss.broadcast(JSON.stringify(connectionMsg))
     console.log(`>> ${clients[clientId].id}`)
@@ -90,7 +92,6 @@ wss.on('connection', function connection(ws) {
         aMessage.id = uuid.v4();
         aMessage.type = "incomingNotification";
         wss.broadcast(JSON.stringify(aMessage));
-        console.log(aMessage.text);
         break;
       default:
         throw new Error(`Unknown event type ${aMessage.type}`);
@@ -104,8 +105,10 @@ wss.on('connection', function connection(ws) {
 
   // Set up a callback for when a client closes the socket. This usually means they closed their browser.
   ws.on('close', () => {
-    console.log('Client disconnected')
+    const day = new Date();
+    console.log(`Client disconnected on ${day}`)
     totalOfConnections--;
+
     clientDisconected(clientId);
 
     // diconnection event

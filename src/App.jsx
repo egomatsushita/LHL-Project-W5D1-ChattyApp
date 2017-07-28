@@ -54,40 +54,27 @@ class App extends Component {
       console.log("Connected to server");
     }
 
-    // this.ws.onmessage = handleMessage(event);
-    /*this.ws.onmessage = (event) => {
-      const receivedMessage = JSON.parse(event.data);
-      let updatedMessage = this.state.messages.concat(receivedMessage);
-      this.setState({messages: updatedMessage})
-    };*/
-
-    // handleMessage(event) {
     this.ws.onmessage = (event) => {
       let incoming = JSON.parse(event.data);
       let messages;
       switch (incoming.type) {
-        // case 'setup':
-        //   this.setState({clients: incoming.data.connectedClients, myself: clients[incoming.data.id]});
-        //   break;
+        case 'setup':
+          this.setState({clients: incoming.data.connectedClients});
+          this.setState({myself: this.state.clients[incoming.data.id]});
+          break;
         case 'connection':
-          // if (incoming.data.id !== myself.id) {
-          //   clients[incoming.data.id] = incoming.data;
-          // }
           this.setState({totalOfConnections: incoming.totalOfConnections});
           console.log("total of connections ", this.state.totalOfConnections)
           break;
         case 'disconnection':
-          // delete clients[incoming.data.id];
+          this.setState({totalOfConnections: incoming.totalOfConnections});
+          delete this.state.clients[incoming.data.id];
           break;
         case 'incomingMessage':
         case 'incomingNotification':
           let updatedMessage = this.state.messages.concat(incoming);
           this.setState({messages: updatedMessage})
-
         default:
-          // const receivedMessage = JSON.parse(event.data);
-          // let updatedMessage = this.state.messages.concat(receivedMessage);
-          // this.setState({messages: updatedMessage})
           break;
       }
     }
