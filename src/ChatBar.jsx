@@ -3,7 +3,6 @@ import React, {Component} from 'react';
 class ChatBar extends Component {
   constructor(props) {
     super(props);
-    console.log(`THIS PROPS USRNAME >>> ${this.props.username}`)
   }
 
   handleKeyPress(e) {

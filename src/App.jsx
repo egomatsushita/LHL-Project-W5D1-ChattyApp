@@ -6,7 +6,10 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {currentUser: {name: "Anonymous"},
-                  messages: []
+                  messages: [],
+                  clients: {},
+                  myself: "",
+                  totalOfConnections: 0
                   };
     this.socket = "ws://localhost:3001";
     this.handleNewMessages = this.handleNewMessages.bind(this);
@@ -14,11 +17,8 @@ class App extends Component {
 
   }
 
-
   handleNewMessages(newMessage) {
-    // newMessage.id = this.state.messages.length + 1;
     const messages = this.state.messages.concat(newMessage);
-    console.log("MESSAGEs >>> ", messages)
 
     let msg = {
       type: "postMessage",
@@ -31,8 +31,6 @@ class App extends Component {
   }
 
   handleNewNotifications(newNotification) {
-    console.log("NEW NOTIFICATION >>> ", newNotification)
-
     this.state.messages.concat(newNotification);
     this.state.currentUser.name = newNotification.username;
 
@@ -46,6 +44,7 @@ class App extends Component {
     this.ws.send(JSON.stringify(msg))
   }
 
+
   componentDidMount() {
     console.log("componentDidMount <App />");
 
@@ -55,12 +54,43 @@ class App extends Component {
       console.log("Connected to server");
     }
 
-    this.ws.onmessage = (event) => {
+    // this.ws.onmessage = handleMessage(event);
+    /*this.ws.onmessage = (event) => {
       const receivedMessage = JSON.parse(event.data);
       let updatedMessage = this.state.messages.concat(receivedMessage);
       this.setState({messages: updatedMessage})
-    };
+    };*/
 
+    // handleMessage(event) {
+    this.ws.onmessage = (event) => {
+      let incoming = JSON.parse(event.data);
+      let messages;
+      switch (incoming.type) {
+        // case 'setup':
+        //   this.setState({clients: incoming.data.connectedClients, myself: clients[incoming.data.id]});
+        //   break;
+        case 'connection':
+          // if (incoming.data.id !== myself.id) {
+          //   clients[incoming.data.id] = incoming.data;
+          // }
+          this.setState({totalOfConnections: incoming.totalOfConnections});
+          console.log("total of connections ", this.state.totalOfConnections)
+          break;
+        case 'disconnection':
+          // delete clients[incoming.data.id];
+          break;
+        case 'incomingMessage':
+        case 'incomingNotification':
+          let updatedMessage = this.state.messages.concat(incoming);
+          this.setState({messages: updatedMessage})
+
+        default:
+          // const receivedMessage = JSON.parse(event.data);
+          // let updatedMessage = this.state.messages.concat(receivedMessage);
+          // this.setState({messages: updatedMessage})
+          break;
+      }
+    }
   }
 
   render() {
@@ -69,6 +99,7 @@ class App extends Component {
       <div>
         <nav className="navbar">
           <a href="/" className="navbar-brand">Chatty</a>
+          <span className="connections">{this.state.totalOfConnections} users online</span>
         </nav>
         <MessageList messages={this.state.messages} />
         <ChatBar username={this.state.currentUser.name} message={this.handleNewMessages} notification={this.handleNewNotifications} />
