@@ -5,6 +5,10 @@ const SocketServer = require('ws').Server;
 const uuid = require('node-uuid');
 const WebSocket = require('ws');
 let totalOfConnections = 0;
+
+// assign a colour to each user
+const colours = ['#FF9800', '#388E3C', '#D32F2F', '#0288D1'];
+
 // Currently connected clients
 let clients = {};
 
@@ -47,9 +51,11 @@ wss.on('connection', function connection(ws) {
 
   // connection event
   function clientConnected(client, clientId) {
+    const index = (totalOfConnections - 1) % 4;
     // create client data
     clients[clientId] = {
       id: clientId,
+      color: colours[index]
     }
 
     // setup message to be set to the client
@@ -57,9 +63,9 @@ wss.on('connection', function connection(ws) {
     const setupMsg = {
       type: 'setup',
       data: {
-        id: clientId,
-        connectedClients: clients
-      }
+              id: clientId,
+              connectedClients: clients
+            }
     }
 
     // connection message to be sent to the client

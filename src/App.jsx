@@ -19,12 +19,16 @@ class App extends Component {
 
   handleNewMessages(newMessage) {
     const messages = this.state.messages.concat(newMessage);
+    const clientId = this.state.clients.data.id;
+    const clients = this.state.clients.data.connectedClients;
+    const color = clients[clientId].color;
 
     let msg = {
       type: "postMessage",
       text: newMessage.content,
       id: newMessage.id,
-      user: newMessage.username
+      user: newMessage.username,
+      color: color
     }
 
     this.ws.send(JSON.stringify(msg))
@@ -59,12 +63,12 @@ class App extends Component {
       let messages;
       switch (incoming.type) {
         case 'setup':
-          this.setState({clients: incoming.data.connectedClients});
+          this.setState({clients: incoming});
+          // this.setState({clients: incoming.data.connectedClients});
           this.setState({myself: this.state.clients[incoming.data.id]});
           break;
         case 'connection':
           this.setState({totalOfConnections: incoming.totalOfConnections});
-          console.log("total of connections ", this.state.totalOfConnections)
           break;
         case 'disconnection':
           this.setState({totalOfConnections: incoming.totalOfConnections});
