@@ -49,6 +49,6 @@ Chatty will allow users to communicate with each other without having to registe
 - react-dom
 
 ## Screenshots
-!['Screenshot of main page'](*)
-!['Screenshot of usernames with different colors'](*)
-!['Screenshot of number of users online'](*)
+!['Screenshot of main page'](https://github.com/egomatsushita/LHL-W5D1-boilerplate/blob/master/docs/main_page.png?raw=true)
+!['Screenshot of usernames with different colors'](https://github.com/egomatsushita/LHL-W5D1-boilerplate/blob/master/docs/diff_color_each_user.png?raw=true)
+!['Screenshot of number of users online'](https://github.com/egomatsushita/LHL-W5D1-boilerplate/blob/master/docs/number_of_users.png?raw=true)
