@@ -14,7 +14,6 @@ class App extends Component {
     this.socket = "ws://localhost:3001";
     this.handleNewMessages = this.handleNewMessages.bind(this);
     this.handleNewNotifications = this.handleNewNotifications.bind(this);
-
   }
 
   handleNewMessages(newMessage) {
@@ -81,8 +80,8 @@ class App extends Component {
         default:
           break;
       }
-    }
-  }
+    } // end of this.ws.onmessage
+  } // end of componentDidMount
 
   render() {
     console.log("Rendering <App/>");
@@ -96,7 +95,7 @@ class App extends Component {
         <ChatBar username={this.state.currentUser.name} message={this.handleNewMessages} notification={this.handleNewNotifications} />
       </div>
     );
-  }
-}
+  } // end of render function
+} // end of App class
 
 export default App;

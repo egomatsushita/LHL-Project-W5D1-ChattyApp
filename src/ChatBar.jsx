@@ -8,7 +8,10 @@ class ChatBar extends Component {
   handleKeyPress(e) {
     if (e.key === 'Enter') {
       if (e.target) {
-        let newMessage = { username: this.props.username, content: e.target.value };
+        let newMessage = {
+                           username: this.props.username,
+                           content: e.target.value
+                         };
         this.props.message(newMessage);
         e.target.value = ""
       }
@@ -18,7 +21,10 @@ class ChatBar extends Component {
   handleUsername(event) {
     if (event.key === 'Enter') {
       let aUsername = event.target.value;
-      let notificationMessage = { username: aUsername, notification: `User ${this.props.username} changed to User ${aUsername}`};
+      let notificationMessage = {
+                                  username: aUsername,
+                                  notification: `User ${this.props.username} changed to User ${aUsername}`
+                                };
       this.props.notification(notificationMessage);
     }
   }

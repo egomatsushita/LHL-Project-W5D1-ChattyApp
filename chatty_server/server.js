@@ -6,7 +6,7 @@ const uuid = require('node-uuid');
 const WebSocket = require('ws');
 let totalOfConnections = 0;
 
-// assign a colour to each user
+// Used to assign a colour to each user
 const colours = ['#FF9800', '#388E3C', '#D32F2F', '#0288D1'];
 
 // Currently connected clients
@@ -17,21 +17,17 @@ const PORT = 3001;
 
 // Create a new express server
 const server = express()
-   // Make the express server serve static assets (html, javascript, css) from the /public folder
   .use(express.static('public'))
   .listen(PORT, '0.0.0.0', 'localhost', () => console.log(`Listening on ${ PORT }`));
 
 // Create the WebSockets server
 const wss = new SocketServer({ server });
 
-// Set up a callback that will run when a client connects to the server
-// When a client connects they are assigned a socket, represented by
-// the ws parameter in the callback.
 wss.on('connection', function connection(ws) {
   const day = new Date();
   console.log(`Client connected on ${day}`);
 
-  // Increment total of connections
+  // Increase total of connections
   totalOfConnections++;
 
   // Broadcast to all
@@ -41,7 +37,7 @@ wss.on('connection', function connection(ws) {
         client.send(data);
       }
     })
-  }
+  } // end of broadcast function
 
   // initialize a new client id
   const clientId = uuid();
@@ -51,6 +47,7 @@ wss.on('connection', function connection(ws) {
 
   // connection event
   function clientConnected(client, clientId) {
+    // index used to assign a color to each user
     const index = (totalOfConnections - 1) % 4;
     // create client data
     clients[clientId] = {
@@ -69,7 +66,7 @@ wss.on('connection', function connection(ws) {
     }
 
     // connection message to be sent to the client
-    // tells teh client who they are
+    // tells the client who they are
     const connectionMsg = {
       type: 'connection',
       data: clients[clientId],
@@ -82,7 +79,7 @@ wss.on('connection', function connection(ws) {
 
     wss.broadcast(JSON.stringify(connectionMsg))
     console.log(`>> ${clients[clientId].id}`)
-  }
+  } // end of clientConnected function
 
 
   ws.on('message', function incoming(data) {
@@ -102,10 +99,8 @@ wss.on('connection', function connection(ws) {
       default:
         throw new Error(`Unknown event type ${aMessage.type}`);
         break;
-
-    }
-
-  });
+    } // end of incoming function
+  }); // end of ws.on('message')
 
 
 
@@ -130,9 +125,9 @@ wss.on('connection', function connection(ws) {
       wss.broadcast(JSON.stringify(disconnectionMsg))
       console.log(`<< Client (${clientId} disconnected`);
       delete clients[clientId];
-    }
-  });
-});
+    } // end of clientDisconected function
+  }); // end of ws.on('close')
+}); // end of wss.on('connection')
 
 
 
